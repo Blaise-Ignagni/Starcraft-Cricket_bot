@@ -3,6 +3,8 @@
 #include <BWAPI.h>
 #include "GameItem.h"
 #include <variant>
+#include <random>
+#include <algorithm>
 
 namespace Tools
 {

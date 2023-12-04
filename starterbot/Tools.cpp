@@ -40,14 +40,21 @@ int Tools::CountUnitsOfType(BWAPI::UnitType type, const BWAPI::Unitset& units)
 
 BWAPI::Unit Tools::GetUnitOfType(BWAPI::UnitType type)
 {
+    std::vector<BWAPI::Unit> workers;
     // For each unit that we own
     for (auto& unit : BWAPI::Broodwar->self()->getUnits())
     {
         // if the unit is of the correct type, and it actually has been constructed, return it
         if (unit->getType() == type && unit->isCompleted())
         {
-            return unit;
+            workers.push_back(unit);
         }
+    }
+    if (!workers.empty()) {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(workers.begin(), workers.end(), g);
+        return workers.back();
     }
 
     // If we didn't find a valid unit to return, make sure we return nullptr

@@ -136,7 +136,6 @@ void StarterBot::Decission_matrix() {
     int SCVCount = 0;
     int MarineCount = 0;
     int FirebatCount = 0;
-    int Supply = 0;
     int SupplyUsed = 0;
     // pass in inputs
     while (!Inputs[0].empty()) {
@@ -153,14 +152,14 @@ void StarterBot::Decission_matrix() {
                 break;
             case 16://command center
                 CommandCenterCount = std::get<int>(value);
-                Supply += 10;
+                //Supply += 10;
                 break;
             case 15://Refinery
                 RefineryCount = std::get<int>(value);
                 break;
             case 13://Depot
                 DepotCount = std::get<int>(value);
-                Supply += 8;
+                //Supply += 8;
                 break;
             case 21://Barracks
                 BarracksCount = std::get<int>(value);
@@ -208,46 +207,48 @@ void StarterBot::Decission_matrix() {
     SupplyUsed =  SCVCount + MarineCount + FirebatCount;
     while (MineralCount > 100) {
         //build supply depot
-        if (Supply > SupplyUsed - 2) { 
+        if (Tools::GetTotalSupply(true) - 2 <= BWAPI::Broodwar->self()->supplyUsed()) {
             Outputs[0].push_back(2);
             Outputs[1].push_back(13);
             Outputs[2].push_back(NULL);
             MineralCount -= 100;
         }
-        //build barracks
-        if (BarracksCount == 0 && MineralCount > 150) {
-            Outputs[0].push_back(2);
-            Outputs[1].push_back(21);
-            Outputs[2].push_back(NULL);
-            MineralCount -= 150;
-        }
-        //build acadamy
-        if (AcadamyCount == 0 && MineralCount > 150) {
-            Outputs[0].push_back(2);
-            Outputs[1].push_back(22);
-            Outputs[2].push_back(NULL);
-            MineralCount -= 150;
-        }
-        //build refinery 
-        if (RefineryCount == 0 && MineralCount > 100) {
-            Outputs[0].push_back(2);
-            Outputs[1].push_back(15);
-            Outputs[2].push_back(NULL);
-            MineralCount -= 150;
-        }
-        //trail marine 
-        if (MarineCount < Supply / 2 && MineralCount > 50 && BarracksCount >= 1) {
-            Outputs[0].push_back(1);
-            Outputs[1].push_back(231);
-            Outputs[2].push_back(Barracks.back());
-            MineralCount -= 50;
-        }
-        //train scv
-        if (SCVCount < Supply / 2 && MineralCount > 50 && CommandCenterCount >= 1) {
-            Outputs[0].push_back(1);
-            Outputs[1].push_back(12);
-            Outputs[2].push_back(Command.back());
-            MineralCount -= 50;
+        else {
+            //build barracks
+            if (BarracksCount == 0 && MineralCount > 150) {
+                Outputs[0].push_back(2);
+                Outputs[1].push_back(21);
+                Outputs[2].push_back(NULL);
+                MineralCount -= 150;
+            }
+            //build acadamy
+            if (AcadamyCount == 0 && MineralCount > 150) {
+                Outputs[0].push_back(2);
+                Outputs[1].push_back(22);
+                Outputs[2].push_back(NULL);
+                MineralCount -= 150;
+            }
+            //build refinery 
+            if (RefineryCount == 0 && MineralCount > 100) {
+                Outputs[0].push_back(2);
+                Outputs[1].push_back(15);
+                Outputs[2].push_back(NULL);
+                MineralCount -= 150;
+            }
+            //trail marine 
+            if (MarineCount < Tools::GetTotalSupply(true) / 2 && MineralCount > 50 && BarracksCount >= 1) {
+                Outputs[0].push_back(1);
+                Outputs[1].push_back(231);
+                Outputs[2].push_back(Barracks.back());
+                MineralCount -= 50;
+            }
+            //train scv
+            if (SCVCount < Tools::GetTotalSupply(true) / 2 && MineralCount > 50 && CommandCenterCount >= 1) {
+                Outputs[0].push_back(1);
+                Outputs[1].push_back(12);
+                Outputs[2].push_back(Command.back());
+                MineralCount -= 50;
+            }
         }
     }
 

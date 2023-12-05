@@ -51,5 +51,6 @@ namespace Tools
     void sendScbMining(BWAPI::Unit unit, int value);
     void moveUnit(BWAPI::Unit unit, int value);
     void AttackUnit(BWAPI::Unit unit, int value);
+    bool NewCommandCenter(BWAPI::UnitType type);
 
 }

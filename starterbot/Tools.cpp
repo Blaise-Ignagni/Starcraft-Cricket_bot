@@ -630,10 +630,33 @@ void Tools::moveUnit(BWAPI::Unit unit, int value) {
 }
 
 void Tools::AttackUnit(BWAPI::Unit unit, int value) {
-    
+
     for (auto& u : BWAPI::Broodwar->self()->getUnits()) {
-        if (u->isIdle() && (u->getType() == BWAPI::UnitTypes::Terran_Marine || u->getType() == BWAPI::UnitTypes::Terran_Firebat)) {
-            if (u->getDistance(unit) < value) {u->rightClick(unit); } 
+        if (u->isIdle() && u->getType() == BWAPI::UnitTypes::Terran_Marine) {
+            if (u->getDistance(unit) < value) { u->rightClick(unit); }
+        }
+        else if (u->isIdle() && u->getType() == BWAPI::UnitTypes::Terran_Firebat && !unit->isFlying()){
+            if (u->getDistance(unit) < value) { u->rightClick(unit); }
         }
     }
+}
+
+bool Tools::NewCommandCenter(BWAPI::UnitType type){
+    BWAPI::UnitType builderType = type.whatBuilds().first;
+
+    BWAPI::Unit builder = Tools::GetUnitOfType(builderType);
+    if (!builder) { return false; }
+
+    auto& startlocations = BWAPI::Broodwar->getStartLocations();
+
+    for (BWAPI::TilePosition tp : startlocations) {
+
+        if (BWAPI::Broodwar->canBuildHere(tp, type, builder)) {
+            return builder->build(type, tp);
+        }
+        else {
+            continue;
+        }
+    }
+    return false;
 }

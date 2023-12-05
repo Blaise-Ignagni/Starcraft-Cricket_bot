@@ -429,7 +429,7 @@ void Tools::get_available_resources(std::vector<std::variant<int, BWAPI::Unit>>(
     k = BWAPI::Broodwar->self()->gas();
     vector_fill(Items, 14, k, NULL);
 
-    int d = 0, r = 0, c = 0, b = 0, a = 0;
+    int d = 0, r = 0, c = 0, b = 0, a = 0, s = 0, f = 0, sf = 0, ct = 0, ms = 0, pl = 0;
     const BWAPI::Unitset& myUnits = BWAPI::Broodwar->self()->getUnits();
     for (auto& unit : myUnits) {
         if (unit->getType() == BWAPI::UnitTypes::Terran_Supply_Depot) { d++; }
@@ -446,6 +446,18 @@ void Tools::get_available_resources(std::vector<std::variant<int, BWAPI::Unit>>(
             a++;
             vector_fill(Items, 423, unit->getHitPoints(), unit);
         }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Factory) {
+            f++;
+            vector_fill(Items, 424, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Starport) {
+            s++;
+            vector_fill(Items, 425, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Science_Facility) {sf++;}
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Control_Tower) { ct++; }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Machine_Shop) { ms++; }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Physics_Lab) { pl++; }
     }
 
     //return depot count [13]
@@ -458,12 +470,24 @@ void Tools::get_available_resources(std::vector<std::variant<int, BWAPI::Unit>>(
     vector_fill(Items, 21, b, NULL);
     //return accadamy count [22]
     vector_fill(Items, 22, a, NULL);
+    //return factory count 
+    vector_fill(Items, 27, f, NULL);
+    //return starport count 
+    vector_fill(Items, 29, s, NULL);
+    //return sci facility count 
+    vector_fill(Items, 210, sf, NULL);
+    //returnn control tower count 
+    vector_fill(Items, 211, ct, NULL);
+    //return machine shop count 
+    vector_fill(Items, 212, ms, NULL);
+    //return Physics lab count 
+    vector_fill(Items, 213, pl, NULL);
 }
 
 void Tools::get_units(std::vector<std::variant<int, BWAPI::Unit>> (&Items)[3]) {
     //return total number of units [230]
 
-    int m = 0, f = 0, s = 0;
+    int m = 0, f = 0, s = 0, v =0, st = 0, w = 0, bc = 0;
     const BWAPI::Unitset& myUnits = BWAPI::Broodwar->self()->getUnits();
     for (auto& unit : myUnits) {
         if (unit->getType() == BWAPI::UnitTypes::Terran_Marine) {
@@ -478,6 +502,26 @@ void Tools::get_units(std::vector<std::variant<int, BWAPI::Unit>> (&Items)[3]) {
             s++;
             vector_fill(Items, 410, unit->getHitPoints(), unit);
         }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture) {
+            v++;
+            vector_fill(Items, 414, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode) {
+            st++;
+            vector_fill(Items, 415, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode) {
+            st++;
+            vector_fill(Items, 415, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Wraith) {
+            w++;
+            vector_fill(Items, 416, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Terran_Battlecruiser) {
+            bc++;
+            vector_fill(Items, 418, unit->getHitPoints(), unit);
+        }
     }
 
     //return marine count [231]
@@ -486,26 +530,38 @@ void Tools::get_units(std::vector<std::variant<int, BWAPI::Unit>> (&Items)[3]) {
     vector_fill(Items, 232, f, NULL);
     //return SCB count [12]
     vector_fill(Items, 12, s, NULL);
+    //return vulture count 
+    vector_fill(Items, 234, v, NULL);
+    //return seige tank count 
+    vector_fill(Items, 235, st, NULL);
+    //return wraith count 
+    vector_fill(Items, 236, w, NULL);
+    //return battlecruiser count 
+    vector_fill(Items, 238, bc, NULL);
 }
 
 void Tools::get_enemy_units(std::vector<std::variant<int, BWAPI::Unit>> (&Items)[3]) {
 
-    int u = 0, b = 0;
+    int g = 0, a = 0, b = 0;
 
     const BWAPI::Unitset& enemyUnits = BWAPI::Broodwar->enemy()->getUnits();
     for (auto& unit : enemyUnits) {
-        if (unit->getType() == BWAPI::UnitTypes::Men) {
-            u++;
+        if (unit->getType() == BWAPI::UnitTypes::Men && unit->getType().isFlyer()) {
+            g++;
             vector_fill(Items, 511, unit->getHitPoints(), unit);
+        }
+        if (unit->getType() == BWAPI::UnitTypes::Men && !unit->getType().isFlyer()) {
+            a++;
+            vector_fill(Items, 512, unit->getHitPoints(), unit);
         }
         if (unit->getType() == BWAPI::UnitTypes::Buildings) {
             b++;
-            vector_fill(Items, 512, unit->getHitPoints(), unit);
+            vector_fill(Items, 513, unit->getHitPoints(), unit);
         }
     }
 
     //get visible enemy units [31]
-    vector_fill(Items, 31, u, NULL);
+    vector_fill(Items, 31, g+a, NULL);
     //get visible enemy buildings [32]
     vector_fill(Items, 32, b, NULL);
 }
@@ -514,6 +570,8 @@ void Tools::BuildUnit(BWAPI::Unit unit, int value) {
     //unit Building 
     //value encoding for what unit to build
     //SCV [12]   Marine [231]  Firebat [232]
+    //Vulture [234] Seige tank [235] 
+    //wraith [236] Battle Cruiser [238]
     switch (value) {
         case 12:
             unit->train(BWAPI::UnitTypes::Terran_SCV);
@@ -523,6 +581,18 @@ void Tools::BuildUnit(BWAPI::Unit unit, int value) {
             break;
         case 232:
             unit->train(BWAPI::UnitTypes::Terran_Firebat);
+            break;
+        case 234:
+            unit->train(BWAPI::UnitTypes::Terran_Vulture);
+            break;
+        case 235:
+            unit->train(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+            break;
+        case 236:
+            unit->train(BWAPI::UnitTypes::Terran_Wraith);
+            break;
+        case 238:
+            unit->train(BWAPI::UnitTypes::Terran_Battlecruiser);
             break;
     }
 }
